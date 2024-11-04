@@ -12,7 +12,7 @@ namespace MeetApp
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public DateTime Start {
+        public DateTime? Start {
             get { return _start; }
             set {
                 if (value <= DateTime.Now)
@@ -33,7 +33,7 @@ namespace MeetApp
                 _end = value;
             }
         }
-        public TimeSpan AlertBefore {
+        public TimeSpan? AlertBefore {
             get { return _alertBefore; }
             set {
                 if (value < TimeSpan.Zero)
@@ -44,16 +44,16 @@ namespace MeetApp
         }
 
         private Timer? _timer;
-        private TimeSpan _alertBefore;
-        private DateTime _start;
+        private TimeSpan? _alertBefore;
+        private DateTime? _start;
         private DateTime _end;
 
         public event EventHandler? MeetupStartsSoon;
 
 
-        public Meetup(string name, string description, DateTime start, DateTime end, TimeSpan alertBefore, EventHandler? notifyStart = null)
+        public Meetup(string name, string description, DateTime start, DateTime end, TimeSpan alertBefore, EventHandler? alertStart = null)
         {
-            MeetupStartsSoon = notifyStart;
+            MeetupStartsSoon = alertStart;
             Name = name;
             Description = description;
             End = end;
@@ -63,11 +63,12 @@ namespace MeetApp
 
         private void ScheduleAlert()
         {
+            if (Start == null || AlertBefore == null || MeetupStartsSoon == null)
+                return;
+
             _timer?.Dispose();
 
-            DateTime now = DateTime.Now;
-
-            TimeSpan untilAlert = Start - DateTime.Now - AlertBefore;
+            TimeSpan untilAlert = Start.Value - DateTime.Now - AlertBefore.Value;
 
             if (untilAlert <= TimeSpan.Zero)
             {
@@ -79,7 +80,7 @@ namespace MeetApp
         }
         public override string ToString()
         {
-            return $"{Name} {Description} {Start.ToShortDateString()}: {Start.ToShortTimeString()} - {End.ToShortTimeString()}";
+            return $"{Name} {Description} {Start.Value.ToShortDateString()}: {Start.Value.ToShortTimeString()} - {End.ToShortTimeString()}";
         }
     }
 }

@@ -11,9 +11,9 @@ namespace MeetApp
         public event EventHandler? MeetupStartsSoon;
         public List<Meetup> MeetupList = new List<Meetup>();
 
-        public MeetupManager(EventHandler? notifyStart = null)
+        public MeetupManager(EventHandler? alertStart = null)
         {
-            MeetupStartsSoon = notifyStart;
+            MeetupStartsSoon = alertStart;
         }
         public void AddMeetup(string name, string desc, DateTime start, DateTime end, TimeSpan alert)
         {
@@ -39,12 +39,12 @@ namespace MeetApp
             if (desc != null)
                 MeetupList[id].Description = desc;
 
-            if (alert != null)
-                MeetupList[id].AlertBefore = alert.Value;
-
             if (start != null && end != null)
             { 
-                MeetupList[id] = new Meetup(MeetupList[id].Name, MeetupList[id].Description, start.Value, end.Value, MeetupList[id].AlertBefore, MeetupStartsSoon);
+                if (alert != null)
+                    MeetupList[id] = new Meetup(MeetupList[id].Name, MeetupList[id].Description, start.Value, end.Value, alert.Value, MeetupStartsSoon);
+                else
+                    MeetupList[id] = new Meetup(MeetupList[id].Name, MeetupList[id].Description, start.Value, end.Value, MeetupList[id].AlertBefore.Value, MeetupStartsSoon);
                 return;
             }
 
@@ -52,10 +52,12 @@ namespace MeetApp
                 MeetupList[id].Start = start.Value;
             if (end != null)
                 MeetupList[id].End = end.Value;
+            if (alert != null)
+                MeetupList[id].AlertBefore = alert.Value;
 
-            
+
         }
-        public List<Meetup> GetMeetupsForDate(DateTime date) => MeetupList.Where(m => m.Start.Date == date.Date).ToList();
+        public List<Meetup> GetMeetupsForDate(DateTime date) => MeetupList.Where(m => m.Start.Value.Date == date.Date).ToList();
         public string GetStringMeetupsForDate(DateTime date) => date.ToShortDateString() + "\n" + string.Join("\n", GetMeetupsForDate(date).Select(m => m.ToString()));
     }
 }
