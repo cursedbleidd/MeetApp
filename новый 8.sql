@@ -1,4 +1,5 @@
---test database
+-- test database
+-- dialect Postgres
 CREATE TABLE Sellers (
     ID SERIAL PRIMARY KEY,
     Surname VARCHAR(50) NOT NULL,
